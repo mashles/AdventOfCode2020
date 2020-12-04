@@ -10,14 +10,14 @@ namespace AdventOfCode
     public class Day_04 : BaseDay
     {
         private readonly string _input;
-        private List<string> _passports;
+        private readonly List<string> _passports;
 
         private readonly string[] _requiredProps = {"byr","iyr","eyr","hgt","hcl","ecl","pid"};
 
         public Day_04()
         {
             _input = File.ReadAllText(InputFilePath);
-            _passports = _input.Split("\n\n").ToList();
+            _passports = _input.Split($"{Environment.NewLine}{Environment.NewLine}").ToList();
         }
 
         public override string Solve_1() => $"Solution to {ClassPrefix} {CalculateIndex()}, part 1: {ValidatePassports()}";
@@ -30,7 +30,7 @@ namespace AdventOfCode
             foreach(var passport in _passports)
             {
                 var fields = new Dictionary<string, string>();
-                foreach(var field in passport.Replace("\n"," ").Split(" "))
+                foreach(var field in passport.Replace(Environment.NewLine, " ").Split(" "))
                 {
                     var keyValue = field.Split(':');
                     fields.Add(keyValue[0], keyValue[1]);
@@ -60,47 +60,59 @@ namespace AdventOfCode
                 }
                 catch(InvalidDataException e)
                 {
-                    Console.WriteLine(e.Message);
+                    //Console.WriteLine(e.Message);
                 }
             }
+            int testCount = goodPassports.Count(x => x.EyeColor.Length != 3);
             return goodPassports.Count;
         }
     }
 
     public class Passport
     {
+        private readonly Regex yearMatcher = new("^[0-9]{4}$");
+        private readonly Regex heightMatcher = new("^[0-9]{2,3}(cm)|(in)$");
+        private readonly Regex hairMatcher = new("^#[0-9a-f]{6}$");
+        private readonly Regex eyeMatch = new("^(amb)|(blu)|(brn)|(gry)|(grn)|(hzl)|(oth)$");
+        private readonly Regex pidMatcher = new("^[0-9]{9}$");
+
+
         public Passport(string data)
         {
-            foreach(var field in data.Replace("\n"," ").Split(" "))
+            foreach(var field in data.Replace(Environment.NewLine," ").Split(" "))
             {
                 var keyValue = field.Split(':');
                 switch(keyValue[0]){
                     case "byr":
                         BirthYear = int.Parse(keyValue[1]);
-                        if(BirthYear < 1920 || BirthYear > 2002)
+                        if(BirthYear < 1920 || BirthYear > 2002 || !yearMatcher.Match(keyValue[1]).Success)
                         {
                             throw new InvalidDataException("BirthYear");
                         }
                     break;
                     case "iyr":
                         IssueYear = int.Parse(keyValue[1]);
-                        if(IssueYear < 2010 || IssueYear > 2020)
+                        if(IssueYear < 2010 || IssueYear > 2020 || !yearMatcher.Match(keyValue[1]).Success)
                         {
                             throw new InvalidDataException("IssueYear");
                         }
                     break;
                     case "eyr":
                         ExpirationYear = int.Parse(keyValue[1]);
-                        if(ExpirationYear < 2020 || ExpirationYear > 2030)
+                        if(ExpirationYear < 2020 || ExpirationYear > 2030 || !yearMatcher.Match(keyValue[1]).Success)
                         {
                             throw new InvalidDataException("ExpirationYear");
                         }
                     break;
                     case "hgt":
+                        if (!heightMatcher.Match(keyValue[1]).Success)
+                        {
+                            throw new InvalidDataException("Height");
+                        }
                         if(keyValue[1].EndsWith("cm"))
                         {
                             Height = int.Parse(keyValue[1].Replace("cm",""));
-                            if(Height < 150 || Height > 193)
+                            if(Height is < 150 or > 193)
                             {
                                 throw new InvalidDataException("HeightCM");
                             }
@@ -108,14 +120,13 @@ namespace AdventOfCode
                         else if(keyValue[1].EndsWith("in"))
                         {
                             Height = int.Parse(keyValue[1].Replace("in",""));
-                            if(Height < 59 || Height > 76)
+                            if(Height is < 59 or > 76)
                             {
                                 throw new InvalidDataException("HeightIN");
                             }
                         }
                         break;
                     case "hcl":
-                        var hairMatcher = new Regex("^#[0-9a-f]{6}$");
                         if(hairMatcher.Match(keyValue[1]).Success)
                         {
                             HairColor = keyValue[1];
@@ -126,7 +137,6 @@ namespace AdventOfCode
                         }
                         break;
                     case "ecl":
-                        var eyeMatch = new Regex("(amb)|(blu)|(brn)|(gry)|(grn)|(hzl)|(oth)");
                         if(eyeMatch.Matches(keyValue[1]).Count == 1)
                         {
                             EyeColor = keyValue[1];
@@ -137,7 +147,6 @@ namespace AdventOfCode
                         }
                         break;
                     case "pid":
-                        var pidMatcher = new Regex("^[0-9]{9}$");
                         if(pidMatcher.Matches(keyValue[1]).Count == 1)
                         {
                             PassportID = keyValue[1];
