@@ -58,9 +58,8 @@ namespace AdventOfCode
                 {
                     goodPassports.Add(new Passport(passport));
                 }
-                catch(InvalidDataException e)
+                catch
                 {
-                    //Console.WriteLine(e.Message);
                 }
             }
             int testCount = goodPassports.Count(x => x.EyeColor.Length != 3);
