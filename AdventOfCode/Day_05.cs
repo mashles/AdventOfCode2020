@@ -42,8 +42,7 @@ namespace AdventOfCode
         public int GetRowOrColumn(string letters)
         {
             string binary = letters.Replace("F","0").Replace("B","1").Replace("L","0").Replace("R","1");
-            int number = Convert.ToInt32(binary, 2);
-            return number;
+            return Convert.ToInt32(binary, 2);
         }
     }
 }
