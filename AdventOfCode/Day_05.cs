@@ -20,35 +20,23 @@ namespace AdventOfCode
 
         public long Solve1()
         {
-            long result = 0;
-            foreach(var input in _input)
-            {
-                int row = GetRowOrColumn(input.Substring(0, 7));
-                int column = GetRowOrColumn(input.Substring(7, 3));
-                var id = row*8+column;
-                if(id > result) { result = id; }
-            }
-            return result;
+            return GetAllSeatIds().Max();
         }
 
         public long Solve2()
         {
-            long result = 0;
+            var allIds = GetAllSeatIds();
+            return allIds.Single(x => allIds.Contains(x) && !allIds.Contains(x+1) && allIds.Contains(x+2)) + 1;
+        }
+
+        public List<int> GetAllSeatIds()
+        {
             var allIds = new List<int>();
             foreach(var input in _input)
             {
-                int row = GetRowOrColumn(input.Substring(0, 7));
-                int column = GetRowOrColumn(input.Substring(7, 3));
-                var id = row*8+column;
-                allIds.Add(id);
+                allIds.Add(GetRowOrColumn(input.Substring(0, 7))*8+GetRowOrColumn(input.Substring(7, 3)));
             }
-            for(int x = 0; x < 1024; x++)
-            {
-                if(allIds.Contains(x+1) && allIds.Contains(x-1) && !allIds.Contains(x)){
-                    result = x;
-                }
-            }
-            return result;
+            return allIds;
         }
 
         public int GetRowOrColumn(string letters)
