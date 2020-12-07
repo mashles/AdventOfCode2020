@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace AdventOfCode
 {
@@ -10,11 +11,12 @@ namespace AdventOfCode
     {
         private readonly string[] _input;
         private List<Bag> _bags = new List<Bag>();
-        private readonly Regex _childBagMatch = new Regex("(\d)\s(.+)\s(bags?)?");
+        private readonly Regex _childBagMatch = new Regex(@"(\d)\s(.+)\s(bags?)?");
 
         public Day_07()
         {
             _input = File.ReadAllLines(InputFilePath);
+            ProcessRules();
         }
 
         public override string Solve_1() => $"Solution to {ClassPrefix} {CalculateIndex()}, part 1: {Solve1()}";
@@ -23,7 +25,18 @@ namespace AdventOfCode
 
         public long Solve1()
         {
-            return 0;
+            var potentialBags = new List<Bag>(_bags.Where(x => x.ChildBags.Exists(x => x.Item2.Color == "shiny gold")));
+            var moreToProcess = true;
+            int currCount = potentialBags.Count;
+            while(moreToProcess)
+            { 
+                foreach(var bag in potentialBags)
+                {
+                    potentialBags.AddRange(_bags.Where(x => x.ChildBags.Exists(x => x.Item2.Color == bag.Color) && !potentialBags.Contains(x)));
+                }
+                if(currCount == potentialBags.Count) { moreToProcess = false; }
+            }
+            return potentialBags.Count;
         }
 
         public long Solve2()
@@ -49,9 +62,14 @@ namespace AdventOfCode
                 var requiredChildren = parentChild[1].Split(", ");
                 foreach(var child in requiredChildren)
                 {
-                    var bagDetails = _childBagMatch.Matches(child);
-                    var childBag = _bags.FirstOrDefault(x => x.Color == )
-                    bag.ChildBags.Add()
+                    var bagDetails = _childBagMatch.Match(child);
+                    var childBag = _bags.FirstOrDefault(x => x.Color == bagDetails.Groups[1].Value);
+                    if(childBag is null)
+                    {
+                        childBag = new Bag(bagDetails.Groups[1].Value);
+                    }
+                    var quantity = int.Parse(bagDetails.Groups[0].Value);
+                    bag.ChildBags.Add((quantity, childBag));
                 }
             }
         }
