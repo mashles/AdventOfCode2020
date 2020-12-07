@@ -28,9 +28,10 @@ namespace AdventOfCode
             var processingBags = new Stack<Bag>(potentialBags);
             while(processingBags.Count > 0)
             {
+                var bag = processingBags.Pop();
                 foreach (var childBag in _bags.Values.Where(
                     x => x.ChildBags.Exists(
-                        x => x.Item2.Color == processingBags.Pop().Color) 
+                        x => x.Item2.Color == bag.Color) 
                     && !potentialBags.Contains(x)))
                 {
                     processingBags.Push(childBag);
@@ -47,7 +48,8 @@ namespace AdventOfCode
             processingBags.Push(_bags["shiny gold"]);
             while (processingBags.Count > 0)
             {
-                foreach (var childBag in processingBags.Pop().ChildBags)
+                var bag = processingBags.Pop();
+                foreach (var childBag in bag.ChildBags)
                 {
                     bagCount += childBag.Item1;
                     for (int i = 0; i < childBag.Item1; i++)
@@ -98,6 +100,7 @@ namespace AdventOfCode
         public Bag(string color, string rule)
         {
             Color = color;
+            Rule = rule;
             ChildBags = new List<(int, Bag)>();
         }
 
