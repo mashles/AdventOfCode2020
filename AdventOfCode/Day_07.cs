@@ -10,7 +10,7 @@ namespace AdventOfCode
     public class Day_07 : BaseDay
     {
         private readonly string[] _input;
-        private readonly List<Bag> _bags = new();
+        private readonly Dictionary<string, Bag> _bags = new();
         private readonly Regex _childBagMatch = new(@"(\d)\s(.+)\s(bags?)?");
 
         public Day_07()
@@ -24,13 +24,14 @@ namespace AdventOfCode
 
         public long Solve1()
         {
-            var potentialBags = new List<Bag>(_bags.Where(x => x.ChildBags.Exists(x => x.Item2.Color == "shiny gold")));
-
+            var potentialBags = new List<Bag>(_bags.Values.Where(x => x.ChildBags.Exists(x => x.Item2.Color == "shiny gold")));
             var processingBags = new Stack<Bag>(potentialBags);
             while(processingBags.Count > 0)
             {
-                var bag = processingBags.Pop();
-                foreach (var childBag in _bags.Where(x => x.ChildBags.Exists(x => x.Item2.Color == bag.Color) && !potentialBags.Contains(x)))
+                foreach (var childBag in _bags.Values.Where(
+                    x => x.ChildBags.Exists(
+                        x => x.Item2.Color == processingBags.Pop().Color) 
+                    && !potentialBags.Contains(x)))
                 {
                     processingBags.Push(childBag);
                     potentialBags.Add(childBag);
@@ -41,14 +42,12 @@ namespace AdventOfCode
 
         public long Solve2()
         {
-            var goldBag = _bags.First(x => x.Color == "shiny gold");
             int bagCount = 0;
             var processingBags = new Stack<Bag>();
-            processingBags.Push(goldBag);
+            processingBags.Push(_bags["shiny gold"]);
             while (processingBags.Count > 0)
             {
-                var bag = processingBags.Pop();
-                foreach (var childBag in bag.ChildBags)
+                foreach (var childBag in processingBags.Pop().ChildBags)
                 {
                     bagCount += childBag.Item1;
                     for (int i = 0; i < childBag.Item1; i++)
@@ -66,26 +65,23 @@ namespace AdventOfCode
             {
                 var parentChild = rule.Split(" contain ");
                 var parentColor = parentChild[0].Replace(" bags", string.Empty);
-
-                _bags.Add(new Bag(parentColor));
+                _bags.Add(parentColor, new Bag(parentColor, parentChild[1]));
             }
-            foreach(var rule in _input)
+            foreach(var bag in _bags)
             {
-                var parentChild = rule.Split(" contain ");
-                var parentColor = parentChild[0].Replace(" bags", string.Empty);
+                ProcessRule(bag.Value);
+            }
+        }
 
-                var bag = _bags.First(x => x.Color == parentColor);
-                var requiredChildren = parentChild[1].Split(", ");
-                foreach(var child in requiredChildren)
+        public void ProcessRule(Bag bag)
+        {
+            var requiredChildren = bag.Rule.Split(", ");
+            foreach(var child in requiredChildren)
+            {
+                if (child != "no other bags.")
                 {
-                    if (child != "no other bags.")
-                    {
-                        var bagDetails = _childBagMatch.Match(child);
-                        var color = bagDetails.Groups[2].Value;
-                        var childBag = _bags.FirstOrDefault(x => x.Color == color);
-                        var quantity = int.Parse(bagDetails.Groups[1].Value);
-                        bag.ChildBags.Add((quantity, childBag));
-                    }
+                    var bagDetails = _childBagMatch.Match(child);
+                    bag.ChildBags.Add((int.Parse(bagDetails.Groups[1].Value), _bags[bagDetails.Groups[2].Value]));
                 }
             }
         }
@@ -95,9 +91,11 @@ namespace AdventOfCode
     {
         public string Color { get; }
 
+        public string Rule { get; }
+
         public List<(int, Bag)> ChildBags { get; }
 
-        public Bag(string color)
+        public Bag(string color, string rule)
         {
             Color = color;
             ChildBags = new List<(int, Bag)>();
