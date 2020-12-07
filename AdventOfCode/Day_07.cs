@@ -10,8 +10,8 @@ namespace AdventOfCode
     public class Day_07 : BaseDay
     {
         private readonly string[] _input;
-        private List<Bag> _bags = new List<Bag>();
-        private readonly Regex _childBagMatch = new Regex(@"(\d)\s(.+)\s(bags?)?");
+        private readonly List<Bag> _bags = new();
+        private readonly Regex _childBagMatch = new(@"(\d)\s(.+)\s(bags?)?");
 
         public Day_07()
         {
@@ -83,7 +83,7 @@ namespace AdventOfCode
         public Bag(string color)
         {
             Color = color;
-            ChildBags = new List<(int, Bag))>();
+            ChildBags = new List<(int, Bag)>();
         }
     }
 }
