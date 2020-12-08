@@ -36,17 +36,11 @@ namespace AdventOfCode
                 switch(_input[i].Substring(0, 3))
                 {
                     case "acc":
-                        if(_input[i][4] == '+')
-                            accumulator += int.Parse(_input[i].Substring(5, _input[i].Length-5));
-                        else
-                            accumulator -= int.Parse(_input[i].Substring(5, _input[i].Length-5));
+                        accumulator += int.Parse(_input[i].Substring(4, _input[i].Length-4));
                         i++;
                         break;
                     case "jmp":
-                        if(_input[i][4] == '+')
-                            i += int.Parse(_input[i].Substring(5, _input[i].Length-5));
-                        else
-                            i -= int.Parse(_input[i].Substring(5, _input[i].Length-5));
+                        i += int.Parse(_input[i].Substring(4, _input[i].Length-4));
                         break;
                     case "nop":
                         i++;
@@ -76,10 +70,7 @@ namespace AdventOfCode
                     switch (_input[i].Substring(0, 3))
                     {
                         case "acc":
-                            if (_input[i][4] == '+')
-                                accumulator += int.Parse(_input[i].Substring(5, _input[i].Length - 5));
-                            else
-                                accumulator -= int.Parse(_input[i].Substring(5, _input[i].Length - 5));
+                            accumulator += int.Parse(_input[i].Substring(4, _input[i].Length-4));
                             i++;
                             break;
                         case "jmp":
@@ -88,10 +79,7 @@ namespace AdventOfCode
                                 switchOccured = true;
                                 goto case "nop";
                             }
-                            if (_input[i][4] == '+')
-                                i += int.Parse(_input[i].Substring(5, _input[i].Length - 5));
-                            else
-                                i -= int.Parse(_input[i].Substring(5, _input[i].Length - 5));
+                            i += int.Parse(_input[i].Substring(4, _input[i].Length-4));
                             break;
                         case "nop":
                             if (i == j && !switchOccured)
