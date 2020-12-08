@@ -53,49 +53,62 @@ namespace AdventOfCode
                         break;    
                 }
             }
-            return 0;
         }
 
         public long Solve2()
         {
-            int i = 0;
-            var accumulator = 0;
-            var runCount = new Dictionary<int, int>();
-            while(i < _input.Count)
+            for (int j = 0; j < _input.Count; j++)
             {
-                var switchInstruction = false;
-                if(runCount.ContainsKey(i))
+                int i = 0;
+                var accumulator = 0;
+                if (!_input[j].StartsWith("jmp") && !_input[j].StartsWith("nop"))
                 {
-                    switchInstruction = true;
-                    Console.WriteLine($"Switched at {i}");
+                    continue;
                 }
-                else
+                var runCount = new Dictionary<int, bool>();
+                var switchOccured = false;
+                while (i < _input.Count)
                 {
-                    runCount.Add(i, 1);
-                }
-                switch(_input[i].Substring(0, 3))
-                {
-                    case "acc":
-                        if(_input[i][4] == '+')
-                            accumulator += int.Parse(_input[i].Substring(5, _input[i].Length-5));
-                        else
-                            accumulator -= int.Parse(_input[i].Substring(5, _input[i].Length-5));
-                        i++;
+                    if (runCount.ContainsKey(i))
                         break;
-                    case "jmp":
-                        if(switchInstruction) { goto case "nop"; }
-                        if(_input[i][4] == '+')
-                            i += int.Parse(_input[i].Substring(5, _input[i].Length-5));
-                        else
-                            i -= int.Parse(_input[i].Substring(5, _input[i].Length-5));
-                        break;
-                    case "nop":
-                        if(switchInstruction) { goto case "jmp"; }
-                        i++;
-                        break;    
+                    else
+                        runCount.Add(i, true);
+                    switch (_input[i].Substring(0, 3))
+                    {
+                        case "acc":
+                            if (_input[i][4] == '+')
+                                accumulator += int.Parse(_input[i].Substring(5, _input[i].Length - 5));
+                            else
+                                accumulator -= int.Parse(_input[i].Substring(5, _input[i].Length - 5));
+                            i++;
+                            break;
+                        case "jmp":
+                            if (i == j && !switchOccured)
+                            {
+                                switchOccured = true;
+                                goto case "nop";
+                            }
+                            if (_input[i][4] == '+')
+                                i += int.Parse(_input[i].Substring(5, _input[i].Length - 5));
+                            else
+                                i -= int.Parse(_input[i].Substring(5, _input[i].Length - 5));
+                            break;
+                        case "nop":
+                            if (i == j && !switchOccured)
+                            {
+                                switchOccured = true;
+                                goto case "jmp";
+                            }
+                            i++;
+                            break;
+                    }
+                    if(i >= _input.Count)
+                    {
+                        return accumulator;
+                    }
                 }
             }
-            return accumulator;
+            return 0;
         }
     }
 }
