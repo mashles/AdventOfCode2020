@@ -11,7 +11,7 @@ namespace AdventOfCode
         private readonly long[] _input;
         private readonly Dictionary<int, List<long>> _sums;
         private readonly Dictionary<int, Dictionary<long, int>> _contiguousSums;
-        private long _part1Answer;
+        private readonly long _part1Answer = 258585477;
 
         public Day_09()
         {
@@ -30,7 +30,6 @@ namespace AdventOfCode
             {
                 if(!_sums.Where(x => x.Key >= (i-25) && x.Key < i).SelectMany(x => x.Value).Contains(_input[i]))
                 {
-                    _part1Answer = _input[i];
                     return _input[i];
                 }
             }
@@ -40,8 +39,7 @@ namespace AdventOfCode
         public long Solve2()
         {
             var indexes = GetFirstAndLastIndex();
-            Console.WriteLine(indexes.Item1 + " - " + indexes.Item2);
-            var range = _input[indexes.Item1..indexes.Item2];
+            var range = _input[indexes.Item1..(indexes.Item2+1)];
             return range.Min()+range.Max();
         }
 
@@ -84,16 +82,16 @@ namespace AdventOfCode
             var sums = new Dictionary<int, Dictionary<long, int>>();
             for(int i = 0; i < _input.Length; i++)
             {
-                sums.Add(i, GetAllSumsContiguous(_input[i], i));
+                sums.Add(i, GetAllSumsContiguous(i));
             }
             return sums;
         }
 
-        public Dictionary<long, int> GetAllSumsContiguous(long number, int index)
+        public Dictionary<long, int> GetAllSumsContiguous(int startingIndex)
         {
+            long contiguousSum = _input[startingIndex];
             var sumList = new Dictionary<long, int>();
-            long contiguousSum = number;
-            for(int i = index + 1; i < _input.Length; i++)
+            for(int i = (startingIndex + 1); i < _input.Length && contiguousSum <= _part1Answer; i++)
             {
                 contiguousSum += _input[i];
                 sumList.Add(contiguousSum, i);
