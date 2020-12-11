@@ -20,7 +20,6 @@ namespace AdventOfCode
         public override string Solve_1() => $"Solution to {ClassPrefix} {CalculateIndex()}, part 1: {Solve1()}";
         public override string Solve_2() => @$"Solution to {ClassPrefix} {CalculateIndex()}, part 2: {Solve2()}";
 
-
         public long Solve1()
         {
             var counter = new Dictionary<int, int>()
