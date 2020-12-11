@@ -9,7 +9,6 @@ namespace AdventOfCode
     public class Day_10 : BaseDay
     {
         private readonly List<int> _input;
-        private long _permCounter = 0;
         public Day_10()
         {
             _input = ReadAllLinesAsIntList(InputFilePath);
@@ -26,11 +25,9 @@ namespace AdventOfCode
         {
             var counter = new Dictionary<int, int>()
             {
-                { 0, 0 },
                 { 1, 0 },
                 { 2, 0 },
-                { 3, 0 },
-                { 4, 0 }
+                { 3, 0 }
             };
             for(int i = 0; i < _input.Count-1; i++)
             {
@@ -41,35 +38,15 @@ namespace AdventOfCode
 
         public long Solve2()
         {
-            return RunToEnd(0);
-        }
+            List<long> permutations = new List<long>() { 1 };
+            for(int i = 1; i < _input.Count; i++)
+            {
+                var minIndex = Math.Max(0, i - 3);
+                int countWithinRange = _input.GetRange(minIndex, i-minIndex).Count(x => x >= _input[i] - 3);
 
-        private int RunToEnd(int index)
-        {
-            var result = 0;
-            if(index == _input.Count - 1)
-                result++;
-            if(index+3 < _input.Count && _input[index+3] - _input[index] <= 3)
-            {
-                result += RunToEnd(index+3);
-            } 
-            if(index+2 < _input.Count && _input[index+2] - _input[index] <= 3)
-            {
-                result += RunToEnd(index+2);
+                permutations.Add(permutations.TakeLast(countWithinRange).Sum());
             }
-            if(index+1 < _input.Count && _input[index+1] - _input[index] <= 3)
-            {
-                result += RunToEnd(index+1);
-            }
-            return result;
-        }
-
-        private void SetDifVal(int dif, Dictionary<int, int> counter)
-        {
-            if(dif <= 3)
-            {
-                counter[dif]++;
-            }
+            return permutations.Last();
         }
 
         public List<int> ReadAllLinesAsIntList(string path)
