@@ -41,15 +41,27 @@ namespace AdventOfCode
 
         public long Solve2()
         {
-            long counter = 1;
-            for(int i = 0; i < _input.Count-1; i++)
-            {
-                var grabCount = Math.Min(3, _input.Count-i);
-                counter = counter * _input.GetRange(i, grabCount).Count(x => x <= _input[i]+3);
-                
-            }
+            return RunToEnd(0);
+        }
 
-            return counter;
+        private int RunToEnd(int index)
+        {
+            var result = 0;
+            if(index == _input.Count - 1)
+                result++;
+            if(index+3 < _input.Count && _input[index+3] - _input[index] <= 3)
+            {
+                result += RunToEnd(index+3);
+            } 
+            if(index+2 < _input.Count && _input[index+2] - _input[index] <= 3)
+            {
+                result += RunToEnd(index+2);
+            }
+            if(index+1 < _input.Count && _input[index+1] - _input[index] <= 3)
+            {
+                result += RunToEnd(index+1);
+            }
+            return result;
         }
 
         private void SetDifVal(int dif, Dictionary<int, int> counter)
