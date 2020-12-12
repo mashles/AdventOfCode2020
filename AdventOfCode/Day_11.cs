@@ -22,19 +22,18 @@ namespace AdventOfCode
 
         public long Solve1()
         {
-            while (ApplyRules() > 0) ;
+            while (ApplyRules(false) > 0) ;
             return _input.Sum(x => x.Count(y => y == '#'));
         }
 
         public long Solve2()
         {
             _input = File.ReadAllLines(InputFilePath).ToList();
-            while (ApplyRules2() > 0) ;
+            while (ApplyRules(true) > 0) ;
             return _input.Sum(x => x.Count(y => y == '#'));
         }
 
-
-        public int ApplyRules()
+        public int ApplyRules(bool isPart2)
         {
             var changeCount = 0;
             var newMap = new List<string>();
@@ -43,7 +42,7 @@ namespace AdventOfCode
                 var newRow = new char[_lineLength];
                 for(int c = 0; c < newRow.Length; c++)
                 {
-                    newRow[c] = GetNewSeatState(c, i);
+                    newRow[c] = GetNewSeatState(c, i, isPart2);
                     if(newRow[c] != _input[i][c])
                     {
                         changeCount++;
@@ -55,55 +54,17 @@ namespace AdventOfCode
             return changeCount;
         }
 
-        public int ApplyRules2()
-        {
-            var changeCount = 0;
-            var newMap = new List<string>();
-            for (int i = 0; i < _input.Count; i++)
-            {
-                var newRow = new char[_lineLength];
-                for (int c = 0; c < newRow.Length; c++)
-                {
-                    newRow[c] = GetNewSeatState2(c, i);
-                    if (newRow[c] != _input[i][c])
-                    {
-                        changeCount++;
-                    }
-                }
-                newMap.Add(new string(newRow));
-            }
-            _input = newMap;
-            return changeCount;
-        }
-
-        public char GetNewSeatState(int x, int y)
+        public char GetNewSeatState(int x, int y, bool isPart2)
         {
             var currentState = _input[y][x];
             switch(currentState)
             {
                 case 'L':
-                    if(GetAdjacentCount(x, y) == 0)
+                    if((isPart2 && GetVisibleCount(x, y) == 0) || (!isPart2 && GetAdjacentCount(x, y) == 0))
                         return '#';
                     break;
                 case '#':
-                    if(GetAdjacentCount(x, y) >= 4)
-                        return 'L';
-                    break;
-            }
-            return currentState;
-        }
-
-        public char GetNewSeatState2(int x, int y)
-        {
-            var currentState = _input[y][x];
-            switch (currentState)
-            {
-                case 'L':
-                    if (GetVisibleCount(x, y) == 0)
-                        return '#';
-                    break;
-                case '#':
-                    if (GetVisibleCount(x, y) >= 5)
+                    if((isPart2 && GetVisibleCount(x, y) >= 5) || (!isPart2 && GetAdjacentCount(x, y) >= 4))
                         return 'L';
                     break;
             }
@@ -113,8 +74,6 @@ namespace AdventOfCode
         public int GetVisibleCount(int x, int y)
         {
             int count = 0;
-            
-
             for(int i = -1; i <= 1; i++)
             {
                 for (int j = -1; j <= 1; j++)
